@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz de français — Speak French with Damien</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F7F3EE;
+    --dark: #1A1612;
+    --accent: #C8502A;
+    --green: #2E7D5A;
+    --red: #C8502A;
+    --card: #FFFFFF;
+    --border: #E8E0D5;
+    --muted: #8A7F74;
+  }
+
+  body {
+    background-color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 80px;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 680px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .brand {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--dark);
+    margin-bottom: 12px;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 32px 0;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .divider span {
+    font-size: 18px;
+  }
+
+  /* Question cards */
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    animation: fadeUp 0.5s ease both;
+    transition: box-shadow 0.2s;
+  }
+
+  .question-card:nth-child(1) { animation-delay: 0.1s; }
+  .question-card:nth-child(2) { animation-delay: 0.2s; }
+  .question-card:nth-child(3) { animation-delay: 0.3s; }
+
+  .question-card:hover {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  }
+
+  .question-number {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--dark);
+    margin-bottom: 20px;
+  }
+
+  /* Options */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .option-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--dark);
+    user-select: none;
+  }
+
+  .option-label:hover {
+    border-color: var(--accent);
+    background: #FDF8F5;
+  }
+
+  .option-label input[type="radio"] {
+    display: none;
+  }
+
+  .option-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.18s;
+    position: relative;
+  }
+
+  .option-label:has(input:checked) .option-dot {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  .option-label:has(input:checked) .option-dot::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: white;
+  }
+
+  .option-label:has(input:checked) {
+    border-color: var(--accent);
+    background: #FDF8F5;
+  }
+
+  /* Result states */
+  .option-label.correct {
+    border-color: var(--green) !important;
+    background: #F0FAF5 !important;
+    color: var(--green);
+    font-weight: 500;
+  }
+
+  .option-label.correct .option-dot {
+    border-color: var(--green);
+    background: var(--green);
+  }
+
+  .option-label.wrong {
+    border-color: var(--red) !important;
+    background: #FDF0ED !important;
+    color: var(--red);
+    font-weight: 500;
+  }
+
+  .option-label.wrong .option-dot {
+    border-color: var(--red);
+    background: var(--red);
+  }
+
+  .result-icon {
+    margin-left: auto;
+    font-size: 16px;
+  }
+
+  /* Explanation */
+  .explanation {
+    margin-top: 14px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+    display: none;
+  }
+
+  .explanation.correct-exp {
+    background: #F0FAF5;
+    color: var(--green);
+    border-left: 3px solid var(--green);
+  }
+
+  .explanation.wrong-exp {
+    background: #FDF0ED;
+    color: #8B2A14;
+    border-left: 3px solid var(--red);
+  }
+
+  /* Submit button */
+  .submit-wrap {
+    text-align: center;
+    margin-top: 32px;
+    animation: fadeUp 0.5s 0.4s ease both;
+  }
+
+  button#submit-btn {
+    background: var(--dark);
+    color: var(--cream);
+    border: none;
+    padding: 16px 48px;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  button#submit-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 0;
+  }
+
+  button#submit-btn:hover::after {
+    transform: translateX(0);
+  }
+
+  button#submit-btn span {
+    position: relative;
+    z-index: 1;
+  }
+
+  button#submit-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* Score panel */
+  #score-panel {
+    display: none;
+    background: var(--dark);
+    color: var(--cream);
+    border-radius: 20px;
+    padding: 40px 36px;
+    margin-top: 32px;
+    text-align: center;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .score-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .score-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 72px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--cream);
+    margin-bottom: 8px;
+  }
+
+  .score-number span {
+    font-size: 32px;
+    color: var(--muted);
+  }
+
+  .score-message {
+    font-size: 15px;
+    color: #B8AFA6;
+    line-height: 1.6;
+    max-width: 380px;
+    margin: 16px auto 28px;
+  }
+
+  .cta-btn {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    padding: 14px 36px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    letter-spacing: 0.03em;
+    transition: opacity 0.2s;
+  }
+
+  .cta-btn:hover { opacity: 0.85; }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Disabled state after submit */
+  .options.locked .option-label {
+    cursor: default;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <p class="brand">Speak French with Damien</p>
+    <h1>Teste ton <em>vrai</em> niveau de français</h1>
+    <p class="subtitle">3 questions pour voir où tu en es. Tes résultats apparaissent à la fin.</p>
+  </header>
+
+  <form id="quiz-form">
+
+    <!-- Question 1 -->
+    <div class="question-card" id="q1-card">
+      <p class="question-number">Question 1</p>
+      <p class="question-text">Complète la phrase : « Hier soir, je _____ au cinéma avec mes amis. »</p>
+      <div class="options" id="q1-options">
+        <label class="option-label">
+          <input type="radio" name="q1" value="a">
+          <span class="option-dot"></span>
+          suis allé
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q1" value="b">
+          <span class="option-dot"></span>
+          ai allé
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q1" value="c">
+          <span class="option-dot"></span>
+          étais allé
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q1" value="d">
+          <span class="option-dot"></span>
+          allais
+        </label>
+      </div>
+      <div class="explanation" id="q1-exp"></div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="question-card" id="q2-card">
+      <p class="question-number">Question 2</p>
+      <p class="question-text">Laquelle de ces phrases est correcte ?</p>
+      <div class="options" id="q2-options">
+        <label class="option-label">
+          <input type="radio" name="q2" value="a">
+          <span class="option-dot"></span>
+          Je me souviens de lui.
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q2" value="b">
+          <span class="option-dot"></span>
+          Je me souviens lui.
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q2" value="c">
+          <span class="option-dot"></span>
+          Je me rappelle de lui.
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q2" value="d">
+          <span class="option-dot"></span>
+          Je me rappelle à lui.
+        </label>
+      </div>
+      <div class="explanation" id="q2-exp"></div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="question-card" id="q3-card">
+      <p class="question-card-inner">
+      <p class="question-number">Question 3</p>
+      <p class="question-text">Choisis la bonne forme : « Il faut que tu _____ plus tôt. »</p>
+      <div class="options" id="q3-options">
+        <label class="option-label">
+          <input type="radio" name="q3" value="a">
+          <span class="option-dot"></span>
+          arrives
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q3" value="b">
+          <span class="option-dot"></span>
+          arriveras
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q3" value="c">
+          <span class="option-dot"></span>
+          arrives
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q3" value="d">
+          <span class="option-dot"></span>
+          arriverais
+        </label>
+      </div>
+      <div class="explanation" id="q3-exp"></div>
+    </div>
+
+    <div class="submit-wrap">
+      <button type="button" id="submit-btn"><span>Voir mes résultats →</span></button>
+    </div>
+
+  </form>
+
+  <div id="score-panel">
+    <p class="score-label">Ton score</p>
+    <p class="score-number" id="score-display">0<span>/3</span></p>
+    <p class="score-message" id="score-message"></p>
+    <a href="#" class="cta-btn">Réserver un cours d'essai gratuit</a>
+  </div>
+
+</div>
+
+<script>
+  const answers = {
+    q1: { correct: 'a', explanation_correct: '✓ Parfait ! « Aller » se conjugue avec ÊTRE au passé composé : je suis allé(e).', explanation_wrong: '✗ La bonne réponse est « suis allé ». Le verbe aller se conjugue avec l\'auxiliaire ÊTRE au passé composé, pas AVOIR.' },
+    q2: { correct: 'a', explanation_correct: '✓ Exactement ! « Se souvenir de quelqu\'un » est la construction correcte.', explanation_wrong: '✗ La bonne réponse est « Je me souviens de lui ». Attention : « se rappeler » se construit sans « de » (je me rappelle lui), contrairement à « se souvenir de ».' },
+    q3: { correct: 'a', explanation_correct: '✓ Bravo ! Après « il faut que », on utilise le subjonctif présent : que tu arrives.', explanation_wrong: '✗ La bonne réponse est « arrives » (subjonctif présent). Après « il faut que », le subjonctif est obligatoire en français.' }
+  };
+
+  const messages = [
+    'Ton français a besoin d\'un bon coup de boost — mais c\'est exactement pour ça que je suis là.',
+    'Pas mal ! Tu as de bonnes bases, mais il y a encore des zones floues à clarifier.',
+    'Très bien ! Tu maîtrises l\'essentiel. Un peu de travail sur les nuances et tu passes au niveau supérieur.',
+    'Excellent ! Ton français est solide. Passons au niveau suivant ensemble.'
+  ];
+
+  document.getElementById('submit-btn').addEventListener('click', function() {
+    let score = 0;
+    let allAnswered = true;
+
+    ['q1', 'q2', 'q3'].forEach(q => {
+      const selected = document.querySelector(`input[name="${q}"]:checked`);
+      if (!selected) { allAnswered = false; return; }
+
+      const options = document.getElementById(`${q}-options`);
+      const labels = options.querySelectorAll('.option-label');
+      const expEl = document.getElementById(`${q}-exp`);
+      const isCorrect = selected.value === answers[q].correct;
+
+      if (isCorrect) score++;
+
+      options.classList.add('locked');
+
+      labels.forEach(label => {
+        const input = label.querySelector('input');
+        const dot = label.querySelector('.option-dot');
+        const icon = document.createElement('span');
+        icon.classList.add('result-icon');
+
+        if (input.value === answers[q].correct) {
+          label.classList.add('correct');
+          dot.style.borderColor = '#2E7D5A';
+          dot.style.background = '#2E7D5A';
+          icon.textContent = '✓';
+          label.appendChild(icon);
+        } else if (input.checked && !isCorrect) {
+          label.classList.add('wrong');
+          dot.style.borderColor = '#C8502A';
+          dot.style.background = '#C8502A';
+          icon.textContent = '✗';
+          label.appendChild(icon);
+        }
+      });
+
+      expEl.style.display = 'block';
+      if (isCorrect) {
+        expEl.classList.add('correct-exp');
+        expEl.textContent = answers[q].explanation_correct;
+      } else {
+        expEl.classList.add('wrong-exp');
+        expEl.textContent = answers[q].explanation_wrong;
+      }
+    });
+
+    if (!allAnswered) {
+      alert('Réponds à toutes les questions avant de valider !');
+      return;
+    }
+
+    this.disabled = true;
+    this.innerHTML = '<span>Résultats envoyés ✓</span>';
+
+    const panel = document.getElementById('score-panel');
+    document.getElementById('score-display').innerHTML = `${score}<span>/3</span>`;
+    document.getElementById('score-message').textContent = messages[score];
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+</script>
+
+</body>
+</html>

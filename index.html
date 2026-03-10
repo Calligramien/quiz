@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz de français — Speak French with Damien</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>What's your real French level? — Speak French with Damien</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -17,7 +17,10 @@
     --card: #FFFFFF;
     --border: #E8E0D5;
     --muted: #8A7F74;
+    --light-muted: #B8AFA6;
   }
+
+  html { scroll-behavior: smooth; }
 
   body {
     background-color: var(--cream);
@@ -27,50 +30,52 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 40px 20px 80px;
+    padding: 48px 20px 100px;
   }
 
-  /* Grain overlay */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 0;
   }
 
   .container {
     width: 100%;
-    max-width: 680px;
+    max-width: 700px;
     position: relative;
     z-index: 1;
   }
 
-  /* Header */
+  /* ── Header ── */
   header {
     text-align: center;
-    margin-bottom: 48px;
-    animation: fadeDown 0.6s ease both;
+    margin-bottom: 52px;
+    animation: fadeDown 0.7s ease both;
   }
 
   .brand {
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 300;
-    font-size: 11px;
-    letter-spacing: 0.2em;
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 16px;
+    font-weight: 400;
+    margin-bottom: 20px;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
   }
 
   h1 {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(28px, 5vw, 42px);
+    font-size: clamp(30px, 5.5vw, 48px);
     font-weight: 700;
-    line-height: 1.15;
+    line-height: 1.12;
     color: var(--dark);
-    margin-bottom: 12px;
+    margin-bottom: 16px;
   }
 
   h1 em {
@@ -82,63 +87,97 @@
     font-size: 15px;
     color: var(--muted);
     font-weight: 300;
-    line-height: 1.6;
+    line-height: 1.65;
+    max-width: 460px;
+    margin: 0 auto;
   }
 
-  /* Divider */
-  .divider {
+  /* ── Progress bar ── */
+  .progress-wrap {
+    margin-bottom: 36px;
+    animation: fadeDown 0.7s 0.1s ease both;
+  }
+
+  .progress-meta {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 32px 0;
-  }
-  .divider::before, .divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-  .divider span {
-    font-size: 18px;
+    justify-content: space-between;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
   }
 
-  /* Question cards */
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 100px;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  /* ── Question cards ── */
   .question-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px 32px;
+    border-radius: 18px;
+    padding: 32px 36px;
     margin-bottom: 20px;
-    animation: fadeUp 0.5s ease both;
-    transition: box-shadow 0.2s;
+    opacity: 0;
+    transform: translateY(18px);
+    transition: box-shadow 0.25s;
   }
 
-  .question-card:nth-child(1) { animation-delay: 0.1s; }
-  .question-card:nth-child(2) { animation-delay: 0.2s; }
-  .question-card:nth-child(3) { animation-delay: 0.3s; }
+  .question-card.visible {
+    animation: fadeUp 0.5s ease forwards;
+  }
 
   .question-card:hover {
-    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    box-shadow: 0 6px 32px rgba(0,0,0,0.055);
+  }
+
+  .q-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
   }
 
   .question-number {
-    font-size: 11px;
-    letter-spacing: 0.15em;
+    font-size: 10px;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--accent);
     font-weight: 500;
-    margin-bottom: 10px;
+  }
+
+  .level-badge {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--cream);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 100px;
   }
 
   .question-text {
     font-family: 'Playfair Display', serif;
     font-size: 17px;
-    line-height: 1.5;
+    line-height: 1.55;
     color: var(--dark);
-    margin-bottom: 20px;
+    margin-bottom: 22px;
   }
 
-  /* Options */
+  /* ── Options ── */
   .options {
     display: flex;
     flex-direction: column;
@@ -148,16 +187,17 @@
   .option-label {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 13px 16px;
+    gap: 14px;
+    padding: 14px 18px;
     border: 1.5px solid var(--border);
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: all 0.18s ease;
-    font-size: 14px;
+    transition: border-color 0.18s, background 0.18s;
+    font-size: 14.5px;
     font-weight: 400;
     color: var(--dark);
     user-select: none;
+    line-height: 1.45;
   }
 
   .option-label:hover {
@@ -165,18 +205,21 @@
     background: #FDF8F5;
   }
 
-  .option-label input[type="radio"] {
-    display: none;
-  }
+  .option-label input[type="radio"] { display: none; }
 
   .option-dot {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     border: 2px solid var(--border);
     flex-shrink: 0;
     transition: all 0.18s;
     position: relative;
+  }
+
+  .option-label:has(input:checked) {
+    border-color: var(--accent);
+    background: #FDF8F5;
   }
 
   .option-label:has(input:checked) .option-dot {
@@ -187,96 +230,86 @@
   .option-label:has(input:checked) .option-dot::after {
     content: '';
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 6px;
-    height: 6px;
+    width: 7px; height: 7px;
     border-radius: 50%;
     background: white;
   }
 
-  .option-label:has(input:checked) {
-    border-color: var(--accent);
-    background: #FDF8F5;
-  }
-
   /* Result states */
+  .options.locked .option-label { cursor: default; pointer-events: none; }
+
   .option-label.correct {
     border-color: var(--green) !important;
-    background: #F0FAF5 !important;
-    color: var(--green);
+    background: #EFF8F3 !important;
+    color: #1E5C3A;
     font-weight: 500;
   }
-
   .option-label.correct .option-dot {
-    border-color: var(--green);
-    background: var(--green);
+    border-color: var(--green) !important;
+    background: var(--green) !important;
   }
 
   .option-label.wrong {
     border-color: var(--red) !important;
     background: #FDF0ED !important;
-    color: var(--red);
+    color: #8B2A14;
     font-weight: 500;
   }
-
   .option-label.wrong .option-dot {
-    border-color: var(--red);
-    background: var(--red);
+    border-color: var(--red) !important;
+    background: var(--red) !important;
   }
 
-  .result-icon {
-    margin-left: auto;
-    font-size: 16px;
-  }
+  .result-icon { margin-left: auto; font-size: 15px; flex-shrink: 0; }
 
-  /* Explanation */
+  /* ── Explanation ── */
   .explanation {
-    margin-top: 14px;
-    padding: 12px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    line-height: 1.6;
+    margin-top: 16px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    line-height: 1.65;
     display: none;
   }
 
   .explanation.correct-exp {
-    background: #F0FAF5;
-    color: var(--green);
+    background: #EFF8F3;
+    color: #1E5C3A;
     border-left: 3px solid var(--green);
   }
 
   .explanation.wrong-exp {
     background: #FDF0ED;
-    color: #8B2A14;
+    color: #7A2412;
     border-left: 3px solid var(--red);
   }
 
-  /* Submit button */
+  /* ── Submit ── */
   .submit-wrap {
     text-align: center;
-    margin-top: 32px;
-    animation: fadeUp 0.5s 0.4s ease both;
+    margin-top: 36px;
+    animation: fadeUp 0.5s 0.3s ease both;
   }
 
-  button#submit-btn {
+  #submit-btn {
     background: var(--dark);
     color: var(--cream);
     border: none;
-    padding: 16px 48px;
+    padding: 18px 52px;
     border-radius: 100px;
     font-family: 'DM Sans', sans-serif;
     font-size: 15px;
     font-weight: 500;
     cursor: pointer;
     letter-spacing: 0.03em;
-    transition: all 0.2s;
+    transition: background 0.25s, transform 0.15s;
     position: relative;
     overflow: hidden;
   }
 
-  button#submit-btn::after {
+  #submit-btn::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -286,287 +319,384 @@
     z-index: 0;
   }
 
-  button#submit-btn:hover::after {
-    transform: translateX(0);
-  }
+  #submit-btn:hover::after { transform: translateX(0); }
+  #submit-btn span { position: relative; z-index: 1; }
+  #submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  #submit-btn:active { transform: scale(0.98); }
 
-  button#submit-btn span {
-    position: relative;
-    z-index: 1;
-  }
-
-  button#submit-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-
-  /* Score panel */
+  /* ── Score panel ── */
   #score-panel {
     display: none;
+    margin-top: 40px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .score-top {
     background: var(--dark);
-    color: var(--cream);
-    border-radius: 20px;
-    padding: 40px 36px;
-    margin-top: 32px;
+    border-radius: 20px 20px 0 0;
+    padding: 48px 40px 40px;
     text-align: center;
-    animation: fadeUp 0.5s ease both;
   }
 
   .score-label {
-    font-size: 11px;
-    letter-spacing: 0.2em;
+    font-size: 10px;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 12px;
+    color: var(--light-muted);
+    margin-bottom: 14px;
   }
 
-  .score-number {
+  .level-result {
     font-family: 'Playfair Display', serif;
-    font-size: 72px;
+    font-size: clamp(52px, 10vw, 80px);
     font-weight: 700;
-    line-height: 1;
     color: var(--cream);
-    margin-bottom: 8px;
+    line-height: 1;
+    margin-bottom: 6px;
   }
 
-  .score-number span {
-    font-size: 32px;
-    color: var(--muted);
+  .level-result em {
+    font-style: italic;
+    color: var(--accent);
   }
 
-  .score-message {
+  .score-sub {
+    font-size: 13px;
+    color: var(--light-muted);
+    margin-bottom: 0;
+  }
+
+  .score-bottom {
+    background: #242018;
+    border-radius: 0 0 20px 20px;
+    padding: 32px 40px 40px;
+  }
+
+  .score-analysis {
     font-size: 15px;
-    color: #B8AFA6;
+    color: #C8C0B8;
+    line-height: 1.75;
+    margin-bottom: 28px;
+  }
+
+  .score-encourage {
+    font-size: 14px;
+    color: var(--light-muted);
+    font-style: italic;
     line-height: 1.6;
-    max-width: 380px;
-    margin: 16px auto 28px;
+    padding-top: 20px;
+    border-top: 1px solid #3A3530;
+    margin-bottom: 32px;
   }
 
   .cta-btn {
     display: inline-block;
     background: var(--accent);
     color: white;
-    padding: 14px 36px;
+    padding: 16px 40px;
     border-radius: 100px;
-    font-size: 14px;
+    font-size: 14.5px;
     font-weight: 500;
     text-decoration: none;
-    letter-spacing: 0.03em;
-    transition: opacity 0.2s;
+    letter-spacing: 0.02em;
+    transition: opacity 0.2s, transform 0.15s;
+    width: 100%;
+    text-align: center;
   }
 
-  .cta-btn:hover { opacity: 0.85; }
+  .cta-btn:hover { opacity: 0.88; transform: translateY(-1px); }
 
-  /* Animations */
+  /* ── Animations ── */
   @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-16px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(-14px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* Disabled state after submit */
-  .options.locked .option-label {
-    cursor: default;
-    pointer-events: none;
+  /* ── Mobile ── */
+  @media (max-width: 600px) {
+    .question-card { padding: 24px 20px; }
+    .score-top, .score-bottom { padding-left: 24px; padding-right: 24px; }
   }
 </style>
 </head>
 <body>
-
 <div class="container">
 
   <header>
-    <p class="brand">Speak French with Damien</p>
-    <h1>Teste ton <em>vrai</em> niveau de français</h1>
-    <p class="subtitle">3 questions pour voir où tu en es. Tes résultats apparaissent à la fin.</p>
+    <span class="brand">Speak French with Damien</span>
+    <h1>What's your <em>real</em><br>French level?</h1>
+    <p class="subtitle">12 questions. No score — just your level, explained honestly. Results appear at the end.</p>
   </header>
 
-  <form id="quiz-form">
-
-    <!-- Question 1 -->
-    <div class="question-card" id="q1-card">
-      <p class="question-number">Question 1</p>
-      <p class="question-text">Complète la phrase : « Hier soir, je _____ au cinéma avec mes amis. »</p>
-      <div class="options" id="q1-options">
-        <label class="option-label">
-          <input type="radio" name="q1" value="a">
-          <span class="option-dot"></span>
-          suis allé
-        </label>
-        <label class="option-label">
-          <input type="radio" name="q1" value="b">
-          <span class="option-dot"></span>
-          ai allé
-        </label>
-        <label class="option-label">
-          <input type="radio" name="q1" value="c">
-          <span class="option-dot"></span>
-          étais allé
-        </label>
-        <label class="option-label">
-          <input type="radio" name="q1" value="d">
-          <span class="option-dot"></span>
-          allais
-        </label>
-      </div>
-      <div class="explanation" id="q1-exp"></div>
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span>Progress</span>
+      <span id="progress-text">0 / 12 answered</span>
     </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
 
-    <!-- Question 2 -->
-    <div class="question-card" id="q2-card">
-      <p class="question-number">Question 2</p>
-      <p class="question-text">Laquelle de ces phrases est correcte ?</p>
-      <div class="options" id="q2-options">
-        <label class="option-label">
-          <input type="radio" name="q2" value="a">
-          <span class="option-dot"></span>
-          Je me souviens de lui.
-        </label>
-        <label class="option-label">
-          <input type="radio" name="q2" value="b">
-          <span class="option-dot"></span>
-          Je me souviens lui.
-        </label>
-        <label class="option-label">
-          <input type="radio" name="q2" value="c">
-          <span class="option-dot"></span>
-          Je me rappelle de lui.
-        </label>
-        <label class="option-label">
-          <input type="radio" name="q2" value="d">
-          <span class="option-dot"></span>
-          Je me rappelle à lui.
-        </label>
-      </div>
-      <div class="explanation" id="q2-exp"></div>
-    </div>
+  <form id="quiz-form"></form>
 
-    <!-- Question 3 -->
-    <div class="question-card" id="q3-card">
-      <p class="question-card-inner">
-      <p class="question-number">Question 3</p>
-      <p class="question-text">Choisis la bonne forme : « Il faut que tu _____ plus tôt. »</p>
-      <div class="options" id="q3-options">
-        <label class="option-label">
-          <input type="radio" name="q3" value="a">
-          <span class="option-dot"></span>
-          arrives
-        </label>
-        <label class="option-label">
-          <input type="radio" name="q3" value="b">
-          <span class="option-dot"></span>
-          arriveras
-        </label>
-        <label class="option-label">
-          <input type="radio" name="q3" value="c">
-          <span class="option-dot"></span>
-          arrives
-        </label>
-        <label class="option-label">
-          <input type="radio" name="q3" value="d">
-          <span class="option-dot"></span>
-          arriverais
-        </label>
-      </div>
-      <div class="explanation" id="q3-exp"></div>
-    </div>
-
-    <div class="submit-wrap">
-      <button type="button" id="submit-btn"><span>Voir mes résultats →</span></button>
-    </div>
-
-  </form>
+  <div class="submit-wrap">
+    <button type="button" id="submit-btn"><span>See my level →</span></button>
+  </div>
 
   <div id="score-panel">
-    <p class="score-label">Ton score</p>
-    <p class="score-number" id="score-display">0<span>/3</span></p>
-    <p class="score-message" id="score-message"></p>
-    <a href="#" class="cta-btn">Réserver un cours d'essai gratuit</a>
+    <div class="score-top">
+      <p class="score-label">Your estimated level</p>
+      <p class="level-result" id="level-display"></p>
+      <p class="score-sub" id="score-raw"></p>
+    </div>
+    <div class="score-bottom">
+      <p class="score-analysis" id="score-analysis"></p>
+      <p class="score-encourage" id="score-encourage"></p>
+      <a href="#" class="cta-btn">Book a free trial lesson with Damien</a>
+    </div>
   </div>
 
 </div>
 
 <script>
-  const answers = {
-    q1: { correct: 'a', explanation_correct: '✓ Parfait ! « Aller » se conjugue avec ÊTRE au passé composé : je suis allé(e).', explanation_wrong: '✗ La bonne réponse est « suis allé ». Le verbe aller se conjugue avec l\'auxiliaire ÊTRE au passé composé, pas AVOIR.' },
-    q2: { correct: 'a', explanation_correct: '✓ Exactement ! « Se souvenir de quelqu\'un » est la construction correcte.', explanation_wrong: '✗ La bonne réponse est « Je me souviens de lui ». Attention : « se rappeler » se construit sans « de » (je me rappelle lui), contrairement à « se souvenir de ».' },
-    q3: { correct: 'a', explanation_correct: '✓ Bravo ! Après « il faut que », on utilise le subjonctif présent : que tu arrives.', explanation_wrong: '✗ La bonne réponse est « arrives » (subjonctif présent). Après « il faut que », le subjonctif est obligatoire en français.' }
-  };
+const questions = [
+  {
+    level: "A1",
+    point: "Articles with professions",
+    text: "Je m'appelle Léa. ___ médecin.",
+    options: ["Je suis une", "Je suis", "J'ai une", "Je suis la"],
+    correct: 1,
+    exp_correct: "Spot on! In French, when you say what someone does for a living, you drop the article entirely after \"être\" — so it's \"Je suis médecin\", not \"Je suis une médecin\". It feels strange for English speakers because we'd say \"I'm a doctor\", but in French, the article simply disappears with professions.",
+    exp_wrong: "In English, you'd say \"I'm a doctor\" — so reaching for \"une\" here is completely natural. But in French, the article disappears after \"être\" when talking about professions. No \"un\", no \"une\", just \"Je suis médecin\". Think of it as French being unusually minimalist in this one case!"
+  },
+  {
+    level: "A2",
+    point: "Passé composé — être vs avoir",
+    text: "Hier, elle ___ au cinéma avec ses amis.",
+    options: ["a allé", "est allée", "a été", "était allée"],
+    correct: 1,
+    exp_correct: "Excellent! \"Aller\" takes \"être\" as its auxiliary in the passé composé, and since the subject is feminine (\"elle\"), the past participle agrees: \"allée\". This is one of the classic \"être\" verbs — movement or change of state verbs like aller, venir, partir, arriver, etc.",
+    exp_wrong: "This is one of the trickiest areas for English speakers, because French uses two different auxiliaries in the past tense — \"avoir\" and \"être\" — where English only uses \"have\". \"Aller\" belongs to a group of verbs (mainly movement and change-of-state verbs) that use \"être\". And because the subject is \"elle\" (feminine), the past participle takes an extra -e: \"allée\". The answer is \"est allée\"."
+  },
+  {
+    level: "B1",
+    point: "Subjonctif après il faut que",
+    text: "Il faut que tu ___ plus tôt demain matin.",
+    options: ["arrives", "arriveras", "arriverais", "es arrivé"],
+    correct: 0,
+    exp_correct: "Parfait! \"Il faut que\" is one of the classic triggers for the subjunctive mood in French. The subjunctive of \"arriver\" in the \"tu\" form is \"arrives\" — which happens to look exactly like the present indicative here, but the mood is different. Whenever you see \"il faut que\", \"il est important que\", or \"je veux que\", subjunctive follows automatically.",
+    exp_wrong: "After \"il faut que\", French requires the subjunctive mood — a verb form that English largely abandoned centuries ago, which is why it catches so many learners off guard. The future (\"arriveras\") and conditional (\"arriverais\") don't work here despite feeling logical in English. The correct form is \"arrives\" — the present subjunctive of \"arriver\". As a rule of thumb: if the phrase expresses necessity, doubt, emotion or desire, subjunctive is almost certainly waiting just around the corner."
+  },
+  {
+    level: "B1",
+    point: "Pronoms COD/COI à l'impératif affirmatif",
+    text: "Tu as le livre ? Donne-___ à Marie !",
+    options: ["lui le", "le lui", "la lui", "lui la"],
+    correct: 1,
+    exp_correct: "Well done! In an affirmative imperative, the object pronouns come after the verb and are joined by a hyphen — and the order is: direct object first, then indirect object. \"Le\" (the book, COD) comes before \"lui\" (to Marie, COI): \"Donne-le lui\". It's the reverse of what you'd use in a regular sentence, which is part of what makes it tricky!",
+    exp_wrong: "French pronoun order is notoriously fiddly, and it shifts depending on whether you're using an affirmative imperative or a regular sentence. In a normal sentence, the order would be COI then COD — but in an affirmative imperative, it flips: the direct object (COD) comes first. So \"le\" (the book) comes before \"lui\" (to Marie): \"Donne-le lui\". A small detail, but a very French one."
+  },
+  {
+    level: "B1",
+    point: "Imparfait vs passé composé",
+    text: "Quand je ___ petit, j'___ souvent à la mer avec ma famille.",
+    options: ["fus / allai", "étais / allais", "ai été / suis allé", "étais / suis allé"],
+    correct: 1,
+    exp_correct: "Exactly right! Both verbs here describe habitual, repeated actions in the past — the kind of thing that happened regularly, not just once. That's the imparfait's territory. \"Quand j'étais petit\" sets a background context, and \"j'allais souvent\" expresses a recurring habit. The imparfait is the go-to tense for childhood memories, routines, and descriptions.",
+    exp_wrong: "French has two main past tenses, and choosing between them is less about when something happened and more about how it happened. The passé composé describes completed, one-off events; the imparfait describes states, habits, and ongoing situations. Here, \"quand j'étais petit\" is a backdrop (state), and \"j'allais souvent\" is a repeated habit — both call for the imparfait. The answer is \"étais / allais\". A useful shortcut: \"souvent\", \"toujours\", \"chaque année\" are strong imparfait signals."
+  },
+  {
+    level: "B2",
+    point: "Subjonctif passé",
+    text: "Je suis surpris qu'il ___ sans rien dire.",
+    options: ["est parti", "parte", "soit parti", "serait parti"],
+    correct: 2,
+    exp_correct: "Excellent! \"Être surpris que\" triggers the subjunctive, and since the departure happened before the moment of surprise (it's already done), you need the past subjunctive — \"soit parti\". The past subjunctive is formed with the subjunctive of \"être\" or \"avoir\" + past participle. It's a sign of real grammatical sophistication in French.",
+    exp_wrong: "\"Être surpris que\" always triggers the subjunctive — so the indicative \"est parti\" is out immediately. But the subtlety here is timing: the departure happened before the surprise, which means you need the past subjunctive, not the present one. \"Parte\" (present subjunctive) would imply it's happening now or in the future. The correct answer is \"soit parti\" — subjunctive of \"être\" + the past participle. It's a fine distinction, but a very rewarding one to master."
+  },
+  {
+    level: "B2",
+    point: "Conditionnel passé — reproche",
+    text: "Tu aurais pu me ___ que tu ne venais pas !",
+    options: ["dire", "dit", "disant", "dis"],
+    correct: 0,
+    exp_correct: "Spot on! \"Aurais pu\" is the conditional perfect of \"pouvoir\", and it's followed by an infinitive — so \"dire\" is correct. This structure (\"aurait pu + infinitif\") expresses a missed possibility or gentle reproach: you could have told me, but you didn't. Very natural in spoken French.",
+    exp_wrong: "\"Aurais pu\" is the conditional perfect of \"pouvoir\", and like all modal verbs in French, it's followed directly by an infinitive — not a past participle. So even though \"dit\" might feel tempting (perhaps by analogy with \"j'aurais dit\"), the correct form here is \"dire\". The full structure is: conditionnel passé de pouvoir + infinitif. The answer is \"Tu aurais pu me dire…\" — a very common way to express reproach or regret in everyday French."
+  },
+  {
+    level: "B2",
+    point: "Pronom relatif dont",
+    text: "C'est un sujet ___ je ne veux pas parler.",
+    options: ["que", "qui", "dont", "lequel"],
+    correct: 2,
+    exp_correct: "Perfect! \"Parler de quelque chose\" — the verb \"parler\" is followed by \"de\". When you want to make a relative clause with a verb that takes \"de\", you use \"dont\". It replaces \"de + noun\" and is one of the most elegant tools in French grammar. \"C'est un sujet dont je ne veux pas parler\" = \"It's a subject I don't want to talk about.\"",
+    exp_wrong: "The key here is the verb \"parler de\" — whenever the verb in the relative clause is followed by \"de\", the relative pronoun you need is \"dont\", not \"que\" or \"qui\". \"Que\" replaces a direct object (no preposition), \"qui\" replaces a subject, and \"dont\" specifically replaces \"de + noun\". So \"C'est un sujet dont je ne veux pas parler\" literally unpacks as \"C'est un sujet, je ne veux pas parler de ce sujet.\" Once you train yourself to spot the \"de\" in the verb, \"dont\" becomes second nature."
+  },
+  {
+    level: "C1",
+    point: "Participe présent composé vs gérondif",
+    text: "___ la porte, il a remarqué que quelqu'un l'avait forcée.",
+    options: ["En ouvrant", "Ouvrant", "Ayant ouvert", "Après avoir ouvert"],
+    correct: 2,
+    exp_correct: "Superb! The \"participe présent composé\" (ayant ouvert) expresses an action that was completed before the main verb — he opened the door, and then noticed. The simple \"ouvrant\" or \"en ouvrant\" would imply the two actions are simultaneous, which doesn't quite fit the logic here. This is a nuance that separates C1 users from the rest.",
+    exp_wrong: "All four options look plausible, which is exactly what makes this a C1 question. \"En ouvrant\" (gérondif) implies the two actions happen at the same time — but here, the opening necessarily comes first, and the noticing follows. \"Ouvrant\" (participe présent simple) has the same limitation. \"Après avoir ouvert\" works grammatically but sounds slightly heavy in this sentence. \"Ayant ouvert\" — the compound participle — is the most precise choice: it signals that the first action was completed before the second began. A small but telling difference."
+  },
+  {
+    level: "C1",
+    point: "Connecteurs logiques — registre soutenu",
+    text: "Sa démission a surpris tout le monde, ___ ses proches collaborateurs ne s'y attendaient pas.",
+    options: ["même que", "voire", "jusqu'à ce que", "à tel point que"],
+    correct: 1,
+    exp_correct: "Excellent! \"Voire\" is a formal connector meaning \"or even\" / \"in fact even\" — it intensifies by adding an extreme case. It's the kind of word that immediately marks sophisticated, written French. Here it tells us that if even his closest colleagues were surprised, the resignation must have been truly unexpected by everyone.",
+    exp_wrong: "This question is as much about register as grammar. \"Même que\" doesn't exist as a connector in standard French. \"Jusqu'à ce que\" means \"until\" and requires the subjunctive — it doesn't work logically here. \"À tel point que\" means \"to such an extent that\" and would need a consequence clause, not an additional surprising detail. \"Voire\" is the right tool: it's a formal intensifier meaning \"or even\", used to add an extreme case that reinforces the main statement. It's the kind of word that gives your written French an immediately elevated feel."
+  },
+  {
+    level: "C2",
+    point: "Subjonctif en proposition relative restrictive",
+    text: "C'est le seul argument qui me convainque vraiment.",
+    options: ["qui", "que", "dont", "lequel"],
+    correct: 0,
+    exp_correct: "Brillant! You've spotted something very subtle: after superlatives and restrictive expressions like \"le seul\", \"le premier\", \"le dernier\", French can use the subjunctive in the relative clause to express subjectivity or doubt. \"Qui me convainque\" (subjunctive) implies \"as far as I'm concerned\" — it's a genuinely sophisticated choice that native speakers use instinctively in careful speech and writing.",
+    exp_wrong: "At first glance, this looks like a simple relative pronoun question — and \"qui\" is indeed correct. But the real subtlety is the verb form: \"convainque\" is the subjunctive of \"convaincre\", not the indicative \"convainc\". After \"le seul\", \"le premier\", \"le dernier\", or a superlative, French speakers often use the subjunctive in the relative clause to add a layer of personal judgment or nuance. It's one of the finest distinctions in the language — the kind of thing that separates a very advanced learner from someone who genuinely thinks in French."
+  },
+  {
+    level: "C2",
+    point: "Passé surcomposé — registre oral",
+    text: "Dès qu'il ___ son discours, les applaudissements ont éclaté.",
+    options: ["a eu fini", "avait fini", "aura fini", "eut fini"],
+    correct: 0,
+    exp_correct: "Exceptional! The passé surcomposé (\"a eu fini\") is used in spoken French — particularly in informal and regional registers — to express an action completed immediately before another past action. It functions like the plus-que-parfait but carries a stronger sense of \"right as soon as\". This tense is rarely taught in textbooks but is very much alive in natural spoken French. Knowing it marks you as a truly advanced user of the language.",
+    exp_wrong: "This is one of the most overlooked tenses in French — the passé surcomposé. It's formed with the passé composé of the auxiliary + the past participle: \"a eu fini\". It's used in spoken French (especially after \"dès que\", \"quand\", \"aussitôt que\") to express an action that was fully completed just before another past action. The plus-que-parfait (\"avait fini\") is its written-register equivalent and is not wrong, but in spoken French paired with a passé composé in the main clause, the passé surcomposé is the more natural choice. \"Eut fini\" is the passé antérieur — literary, almost archaic, and very rarely seen outside 19th-century prose."
+  }
+];
 
-  const messages = [
-    'Ton français a besoin d\'un bon coup de boost — mais c\'est exactement pour ça que je suis là.',
-    'Pas mal ! Tu as de bonnes bases, mais il y a encore des zones floues à clarifier.',
-    'Très bien ! Tu maîtrises l\'essentiel. Un peu de travail sur les nuances et tu passes au niveau supérieur.',
-    'Excellent ! Ton français est solide. Passons au niveau suivant ensemble.'
-  ];
+const levels = [
+  { min: 0,  max: 2,  label: "A1 — A2", analysis: "You're right at the beginning of your French journey, and that's actually a brilliant place to be — everything is still ahead of you. At this stage, you're probably comfortable with a few key phrases, some basic vocabulary, and the very foundations of the language. The trickier grammar — past tenses, pronouns, verb moods — is still feeling quite unfamiliar, and that's completely normal. The good news is that the progress you make at A1/A2 is the most visible and the most satisfying: every lesson feels like a genuine breakthrough.", encourage: "Your next step is building solid foundations — the kind that make everything else click into place later. That's exactly what I'm here for." },
+  { min: 3,  max: 4,  label: "A2 — B1", analysis: "You've got a real working knowledge of French — more than you might think. You can handle everyday situations, you've got a feel for the basics of French grammar, and you're starting to move beyond set phrases into constructing your own sentences. The gaps showing up at this level tend to be around past tenses (especially the imparfait/passé composé distinction), pronoun placement, and the very first glimpses of the subjunctive. These aren't signs of weakness — they're the exact points where French starts getting interesting.", encourage: "You're closer to fluency than you probably feel. With the right guidance, B1 is very much within reach." },
+  { min: 5,  max: 6,  label: "B1 — B2", analysis: "You have a solid, functional level of French — you can follow conversations, express yourself on a range of topics, and navigate most everyday and professional situations. What's holding you back from the next level is usually a mix of things: instinctive tense choice, pronoun subtleties, and starting to feel comfortable with the subjunctive rather than just knowing it exists. At B1/B2, the grammar is rarely catastrophically wrong — it's more about finesse, fluency, and trusting yourself.", encourage: "You're at a genuinely exciting stage. The jump from B1 to B2 is where French really starts to feel like yours." },
+  { min: 7,  max: 9,  label: "B2 — C1", analysis: "You have a genuinely strong command of French. You're handling complex grammar with confidence, your instincts are mostly reliable, and you can engage with nuanced topics in the language. At this level, the things that tend to catch people out are the more subtle choices — the passé surcomposé, the subjunctive in relative clauses, formal connectors, the kind of details that separate \"very good French\" from \"French that sounds native\". You're not making basic errors; you're navigating genuine sophistication.", encourage: "You're close to the top — and working with a native speaker is exactly the kind of thing that gets you there." },
+  { min: 10, max: 12, label: "C1 — C2", analysis: "This is an exceptional result. Your French is operating at a very high level — you're navigating tense nuance, register, complex syntax, and the kind of grammatical subtleties that most learners never encounter. At C1/C2, the work shifts from learning rules to internalising the instincts of a native speaker: knowing not just what's correct, but what sounds natural, what's elegant, and what a French person would actually say in a given moment.", encourage: "Even at this level, there's always something to refine — and that's what makes French endlessly fascinating. Let's push it to the very top." }
+];
 
-  document.getElementById('submit-btn').addEventListener('click', function() {
-    let score = 0;
-    let allAnswered = true;
+// Build quiz DOM
+const form = document.getElementById('quiz-form');
 
-    ['q1', 'q2', 'q3'].forEach(q => {
-      const selected = document.querySelector(`input[name="${q}"]:checked`);
-      if (!selected) { allAnswered = false; return; }
+questions.forEach((q, i) => {
+  const card = document.createElement('div');
+  card.className = 'question-card';
+  card.id = `card-${i}`;
 
-      const options = document.getElementById(`${q}-options`);
-      const labels = options.querySelectorAll('.option-label');
-      const expEl = document.getElementById(`${q}-exp`);
-      const isCorrect = selected.value === answers[q].correct;
+  const optionsHTML = q.options.map((opt, j) => `
+    <label class="option-label">
+      <input type="radio" name="q${i}" value="${j}">
+      <span class="option-dot"></span>
+      ${opt}
+    </label>
+  `).join('');
 
-      if (isCorrect) score++;
+  card.innerHTML = `
+    <div class="q-header">
+      <span class="question-number">Question ${i + 1}</span>
+      <span class="level-badge">${q.level}</span>
+    </div>
+    <p class="question-text">${q.text}</p>
+    <div class="options" id="opts-${i}">${optionsHTML}</div>
+    <div class="explanation" id="exp-${i}"></div>
+  `;
 
-      options.classList.add('locked');
+  form.appendChild(card);
+});
 
-      labels.forEach(label => {
-        const input = label.querySelector('input');
-        const dot = label.querySelector('.option-dot');
-        const icon = document.createElement('span');
-        icon.classList.add('result-icon');
+// Animate cards on load
+const cards = document.querySelectorAll('.question-card');
+cards.forEach((card, i) => {
+  setTimeout(() => card.classList.add('visible'), 80 + i * 60);
+});
 
-        if (input.value === answers[q].correct) {
-          label.classList.add('correct');
-          dot.style.borderColor = '#2E7D5A';
-          dot.style.background = '#2E7D5A';
-          icon.textContent = '✓';
-          label.appendChild(icon);
-        } else if (input.checked && !isCorrect) {
-          label.classList.add('wrong');
-          dot.style.borderColor = '#C8502A';
-          dot.style.background = '#C8502A';
-          icon.textContent = '✗';
-          label.appendChild(icon);
-        }
-      });
+// Progress tracking
+function updateProgress() {
+  let answered = 0;
+  questions.forEach((_, i) => {
+    if (document.querySelector(`input[name="q${i}"]:checked`)) answered++;
+  });
+  document.getElementById('progress-text').textContent = `${answered} / ${questions.length} answered`;
+  document.getElementById('progress-fill').style.width = `${(answered / questions.length) * 100}%`;
+}
 
-      expEl.style.display = 'block';
-      if (isCorrect) {
-        expEl.classList.add('correct-exp');
-        expEl.textContent = answers[q].explanation_correct;
-      } else {
-        expEl.classList.add('wrong-exp');
-        expEl.textContent = answers[q].explanation_wrong;
+form.addEventListener('change', updateProgress);
+
+// Submit
+document.getElementById('submit-btn').addEventListener('click', function () {
+  let score = 0;
+  let allAnswered = true;
+
+  questions.forEach((q, i) => {
+    const selected = document.querySelector(`input[name="q${i}"]:checked`);
+    if (!selected) { allAnswered = false; return; }
+
+    const opts = document.getElementById(`opts-${i}`);
+    const labels = opts.querySelectorAll('.option-label');
+    const expEl = document.getElementById(`exp-${i}`);
+    const isCorrect = parseInt(selected.value) === q.correct;
+
+    if (isCorrect) score++;
+    opts.classList.add('locked');
+
+    labels.forEach((label, j) => {
+      const input = label.querySelector('input');
+      const dot = label.querySelector('.option-dot');
+      const icon = document.createElement('span');
+      icon.className = 'result-icon';
+
+      if (j === q.correct) {
+        label.classList.add('correct');
+        dot.style.borderColor = '#2E7D5A';
+        dot.style.background = '#2E7D5A';
+        icon.textContent = '✓';
+        label.appendChild(icon);
+      } else if (input.checked && !isCorrect) {
+        label.classList.add('wrong');
+        dot.style.borderColor = '#C8502A';
+        dot.style.background = '#C8502A';
+        icon.textContent = '✗';
+        label.appendChild(icon);
       }
     });
 
-    if (!allAnswered) {
-      alert('Réponds à toutes les questions avant de valider !');
-      return;
+    expEl.style.display = 'block';
+    if (isCorrect) {
+      expEl.classList.add('correct-exp');
+      expEl.textContent = q.exp_correct;
+    } else {
+      expEl.classList.add('wrong-exp');
+      expEl.textContent = q.exp_wrong;
     }
-
-    this.disabled = true;
-    this.innerHTML = '<span>Résultats envoyés ✓</span>';
-
-    const panel = document.getElementById('score-panel');
-    document.getElementById('score-display').innerHTML = `${score}<span>/3</span>`;
-    document.getElementById('score-message').textContent = messages[score];
-    panel.style.display = 'block';
-    panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
-</script>
 
+  if (!allAnswered) {
+    alert('Please answer all questions before submitting!');
+    return;
+  }
+
+  this.disabled = true;
+  this.innerHTML = '<span>Submitted ✓</span>';
+
+  // Determine level
+  const levelData = levels.find(l => score >= l.min && score <= l.max);
+
+  const panel = document.getElementById('score-panel');
+  document.getElementById('level-display').innerHTML = levelData.label.replace('—', '<em>—</em>');
+  document.getElementById('score-raw').textContent = `${score} out of ${questions.length} correct`;
+  document.getElementById('score-analysis').textContent = levelData.analysis;
+  document.getElementById('score-encourage').textContent = levelData.encourage;
+
+  panel.style.display = 'block';
+  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+});
+</script>
 </body>
 </html>
